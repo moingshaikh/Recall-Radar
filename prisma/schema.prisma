@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+model User {
+  id        String           @id @default(cuid())
+  email     String           @unique
+  name      String?
+  retailer  Retailer?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+}
+
+model Retailer {
+  id          String            @id @default(cuid())
+  name        String
+  userId      String            @unique
+  user        User              @relation(fields: [userId], references: [id])
+  catalogs    Catalog[]
+  preferences UserPreference[]
+  alerts      Alert[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+model Catalog {
+  id         String    @id @default(cuid())
+  retailerId String
+  retailer   Retailer  @relation(fields: [retailerId], references: [id])
+  name       String
+  sourceFile String?
+  uploadedAt DateTime  @default(now())
+  products   Product[]
+  updatedAt  DateTime  @updatedAt
+}
+
+model Product {
+  id          String        @id @default(cuid())
+  catalogId   String
+  catalog     Catalog       @relation(fields: [catalogId], references: [id])
+  sku         String?
+  gtin        String?
+  brand       String?
+  name        String
+  category    String?
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  matches     RecallMatch[]
+}
+
+model RecallAlert {
+  id          String        @id @default(cuid())
+  source      String
+  title       String
+  description String
+  brand       String?
+  category    String?
+  hazardLevel String?
+  publishedAt DateTime?
+  officialUrl String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  matches     RecallMatch[]
+}
+
+model RecallMatch {
+  id          String       @id @default(cuid())
+  productId   String
+  product     Product      @relation(fields: [productId], references: [id])
+  recallId    String
+  recall      RecallAlert  @relation(fields: [recallId], references: [id])
+  matchScore  Float
+  matchReason String?
+  status      String       @default("open")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Alert {
+  id          String    @id @default(cuid())
+  retailerId  String
+  retailer    Retailer  @relation(fields: [retailerId], references: [id])
+  title       String
+  summary     String
+  severity    String
+  status      String    @default("open")
+  category    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model UserPreference {
+  id          String    @id @default(cuid())
+  retailerId  String
+  retailer    Retailer  @relation(fields: [retailerId], references: [id])
+  emailDigest Boolean   @default(true)
+  urgentOnly  Boolean   @default(false)
+  categories  String[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}

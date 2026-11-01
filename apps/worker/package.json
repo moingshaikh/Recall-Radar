@@ -1,0 +1,22 @@
+{
+  "name": "@recall-radar/worker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.16.2",
+    "@recall-radar/shared": "*",
+    "bullmq": "^5.0.0",
+    "ioredis": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.2"
+  }
+}
